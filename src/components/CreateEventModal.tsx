@@ -19,7 +19,7 @@ type EventFormData = z.infer<typeof eventSchema>;
 interface CreateEventModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (data: Omit<Event, 'id' | 'attendeesCount'>) => void;
+    onSubmit: (data: Omit<Event, 'id' | 'attendeesCount' | 'organizerId'>) => void;
     isLoading?: boolean;
 }
 

@@ -1,8 +1,8 @@
 export interface User {
-    id?: string;
+    id: string;
     name: string;
     email: string;
-    role: 'PARTICIPANT' | 'ORGANIZER';
+    role: 'PARTICIPANT' | 'ORGANIZER' | 'ADMIN' | 'USER'; // Accommodate both old and new roles during transition
 }
 
 export interface Event {
@@ -13,8 +13,7 @@ export interface Event {
     location: string;
     maxAttendees: number;
     attendeesCount: number;
-    // Optional: Add organizerId if available from API to check ownership
-    organizerId?: string;
+    organizerId: string;
 }
 
 export interface AuthResponse {

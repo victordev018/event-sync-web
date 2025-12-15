@@ -45,7 +45,18 @@ export function Login() {
         setError("");
         try {
             const res = await api.post("/api/auth/login", data);
-            login(res.data.token);
+
+            // Backend returns: { token, userId, name, role }
+            // We need to construct User object matching our type: { id, name, email, role }
+            // Email is in the form data
+            const userData = {
+                id: res.data.userId,
+                name: res.data.name,
+                email: data.email,
+                role: res.data.role
+            };
+
+            login(res.data.token, userData as any); // Type assertion if Role format matches
             addToast("Login realizado com sucesso!", "success");
             navigate("/dashboard");
         } catch (err: any) {

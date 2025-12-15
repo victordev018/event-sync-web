@@ -1,84 +1,49 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import api from '../lib/api';
 import type { User } from '../types';
 
 interface AuthContextType {
     user: User | null;
-    token: string | null;
-    login: (token: string, userData?: User) => void;
-    logout: () => void;
     isAuthenticated: boolean;
+    login: (token: string, userData: User) => void;
+    logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
 
     useEffect(() => {
-        if (token) {
-            localStorage.setItem('token', token);
-            // Try to decode user from token or use stored user
-            // For this MVP, we might need to store user details separately if encoded in token
-            // or assume the user object is set during login.
-            // Let's try to restore user from localStorage if we saved it there
-            const storedUser = localStorage.getItem('user');
-            if (storedUser) {
-                try {
-                    setUser(JSON.parse(storedUser));
-                } catch (e) {
-                    console.error("Failed to parse user", e);
-                }
-            } else {
-                // Optional: Decode token here if needed
-                try {
-                    const payload = JSON.parse(atob(token.split('.')[1]));
-                    // Construct a basic user from payload if possible
-                    if (payload.sub && !user) {
-                        setUser({ email: payload.sub, name: payload.name || payload.sub.split('@')[0], role: payload.role || 'PARTICIPANT' } as User);
-                    }
-                } catch (e) {
-                    // invalid token
-                }
-            }
-        } else {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            setUser(null);
-        }
-    }, [token]);
-
-    const login = (newToken: string, userData?: User) => {
-        setToken(newToken);
-        if (userData) {
-            setUser(userData);
-            localStorage.setItem('user', JSON.stringify(userData));
-        } else {
-            // If no user data provided, try to extract from token immediately
+        const token = localStorage.getItem("token");
+        const savedUser = localStorage.getItem("user");
+        if (token && savedUser) {
+            api.defaults.headers.common.Authorization = `Bearer ${token}`;
             try {
-                const payload = JSON.parse(atob(newToken.split('.')[1]));
-                const extractedUser = {
-                    email: payload.sub,
-                    name: payload.name || payload.sub, // Fallback
-                    role: payload.role || 'PARTICIPANT'
-                } as User;
-                setUser(extractedUser);
-                localStorage.setItem('user', JSON.stringify(extractedUser));
+                setUser(JSON.parse(savedUser));
             } catch (e) {
-                console.error("Could not extract user from token");
+                console.error("Failed to parse user from storage", e);
+                localStorage.removeItem("user");
             }
         }
+    }, []);
+
+    const login = (token: string, userData: User) => {
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(userData));
+        api.defaults.headers.common.Authorization = `Bearer ${token}`;
+        setUser(userData);
     };
 
     const logout = () => {
-        setToken(null);
         setUser(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        delete api.defaults.headers.common.Authorization;
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!token }}>
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

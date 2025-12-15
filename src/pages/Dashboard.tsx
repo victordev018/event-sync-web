@@ -19,6 +19,7 @@ export function Dashboard() {
     const { addToast } = useToast();
 
     const [events, setEvents] = useState<Event[]>([]);
+    const [attendingEvents, setAttendingEvents] = useState<Event[]>([]);
     const [mySubscriptions, setMySubscriptions] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -35,6 +36,7 @@ export function Dashboard() {
 
             setEvents(eventsRes.data);
             setMySubscriptions(subsRes.data.map((e: any) => e.id));
+            setAttendingEvents(subsRes.data); // Store full subscription data including checkedIn status
         } catch (error) {
             console.error(error);
             addToast("Erro ao carregar eventos.", "error");
@@ -85,7 +87,6 @@ export function Dashboard() {
 
     // Filtered lists
     const myCreatedEvents = events.filter(e => e.organizerId === user?.id);
-    const mySubscribedEvents = events.filter(e => mySubscriptions.includes(e.id));
     const exploreEvents = events.filter(e => !(mySubscriptions.includes(e.id) || e.organizerId === user?.id));
 
     if (loading && events.length === 0) {
@@ -173,11 +174,11 @@ export function Dashboard() {
                     </TabsContent>
 
                     <TabsContent value="attending">
-                        {mySubscribedEvents.length === 0 ? (
+                        {attendingEvents.length === 0 ? (
                             <div className="text-center py-10 text-muted-foreground">Você não está inscrito em nenhum evento.</div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {mySubscribedEvents.map((event) => (
+                                {attendingEvents.map((event) => (
                                     <EventCard
                                         key={event.id}
                                         event={event}

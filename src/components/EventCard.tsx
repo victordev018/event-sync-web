@@ -35,7 +35,7 @@ export function EventCard({ event, user, isSubscribed, onUpdate, onEdit, onDelet
         }
         setLoading(true);
         try {
-            await api.post(`/api/events/${event.id}/subscribe/${user.id}`);
+            await api.post(`/api/events/${event.id}/subscribe`);
             addToast("Inscrição realizada com sucesso!", "success");
             onUpdate?.();
         } catch (error: any) {
@@ -51,7 +51,7 @@ export function EventCard({ event, user, isSubscribed, onUpdate, onEdit, onDelet
 
         setLoading(true);
         try {
-            await api.delete(`/api/events/${event.id}/subscribe/${user.id}`);
+            await api.delete(`/api/events/${event.id}/subscribe`);
             addToast("Inscrição cancelada.", "info");
             onUpdate?.();
         } catch (error: any) {
@@ -150,6 +150,7 @@ export function EventCard({ event, user, isSubscribed, onUpdate, onEdit, onDelet
                     userName={user.name}
                     eventId={event.id}
                     userId={user.id}
+                    checkedIn={event.checkedIn}
                 />
             )}
 

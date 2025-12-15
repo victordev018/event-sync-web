@@ -14,6 +14,7 @@ export interface Event {
     maxAttendees: number;
     attendeesCount: number;
     organizerId: string;
+    checkedIn?: boolean;
 }
 
 export interface AuthResponse {

@@ -9,9 +9,10 @@ interface CredentialModalProps {
     userName: string;
     eventId: string;
     userId: string;
+    checkedIn?: boolean;
 }
 
-export function CredentialModal({ isOpen, onClose, eventName, userName, eventId, userId }: CredentialModalProps) {
+export function CredentialModal({ isOpen, onClose, eventName, userName, eventId, userId, checkedIn }: CredentialModalProps) {
     const qrData = JSON.stringify({ eventId, userId });
 
     return (
@@ -36,13 +37,22 @@ export function CredentialModal({ isOpen, onClose, eventName, userName, eventId,
                     />
                 </div>
 
-                <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2">
-                    <span className="relative flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                    </span>
-                    Inscrição Confirmada
-                </div>
+                {checkedIn ? (
+                    <div className="bg-green-100 text-green-700 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2">
+                        <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                        </span>
+                        Presença Confirmada
+                    </div>
+                ) : (
+                    <div className="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2">
+                        <span className="relative flex h-3 w-3">
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                        </span>
+                        Check-in Pendente
+                    </div>
+                )}
 
                 <Button onClick={onClose} className="w-full">
                     Fechar

@@ -10,7 +10,7 @@ export function Home() {
     const navigate = useNavigate();
     const { user } = useAuth();
 
-    const { data: events, isLoading, error } = useQuery<Event[]>({
+    const { data: events, isLoading, error, refetch } = useQuery<Event[]>({
         queryKey: ['events'],
         queryFn: async () => {
             const res = await api.get('/api/events');
@@ -67,7 +67,8 @@ export function Home() {
                             <EventCard
                                 key={event.id}
                                 event={event}
-                                onSubscribe={() => user ? navigate('/dashboard') : navigate('/login')}
+                                user={user}
+                                onUpdate={() => refetch()}
                             />
                         ))}
                     </div>

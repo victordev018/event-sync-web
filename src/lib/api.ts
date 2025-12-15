@@ -20,4 +20,8 @@ api.interceptors.request.use(
     }
 );
 
+export const getSubscriptions = (eventId: string) => api.get(`/api/events/${eventId}/subscriptions`);
+
+export const performCheckIn = (eventId: string, userId: string) => api.post(`/api/events/${eventId}/checkin/${userId}`);
+
 export default api;
